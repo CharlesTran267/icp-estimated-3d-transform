@@ -1,0 +1,403 @@
+{
+  "name": "stereo_md",
+  "description": "Eureka Controller Project Configuration",
+  "devices": [
+    {
+      "device_type": "MDVisionCameras",
+      "data": {
+        "playback_config": {"image_dir":  "",  "images":  [],  "pointclouds":  []},
+        "placement": {
+          "device": "",
+          "frame": "",
+          "tvec": [0,  0,  0],
+          "rvec": [0,  0,  0]
+        },
+        "name": "left",
+        "ip": "192.168.0.157",
+        "num_retry": 3,
+        "simulation": false
+      }
+    },
+    {
+      "device_type": "MDVisionCameras",
+      "data": {
+        "playback_config": {"image_dir":  "",  "images":  [],  "pointclouds":  []},
+        "placement": {
+          "device": "",
+          "frame": "",
+          "tvec": [0,  0,  0],
+          "rvec": [0,  0,  0]
+        },
+        "name": "right",
+        "ip": "192.168.0.228",
+        "num_retry": 3,
+        "simulation": false
+      }
+    }
+  ],
+  "graphs": [
+    {
+      "api_version": 3,
+      "name": "graph",
+      "nodes": [
+        {
+          "api_version": 3,
+          "tmpl_function_str": "DeepLearningStereo",
+          "tmpl_function_kwargs": {
+            "info": "config://stereo_md/stereo_info_60cm.json",
+            "image_width": 2592,
+            "image_height": 1944,
+            "model_name": "raft-stereo-onnx",
+            "verbose": true,
+            "max_Z": 1.0,
+            "ignored_edge_width": 20,
+            "speckle_window_side_len": 50,
+            "max_speckle_diff": 0,
+            "use_stereo_rectify_2": true,
+            "working_distance": 0.7
+          },
+          "name": "Deep_learning_stereo",
+          "pos": [500.0,  300.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "ImageRead",
+          "tmpl_function_kwargs": {},
+          "name": "Image_read",
+          "pos": [260.0,  430.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "ImageRead",
+          "tmpl_function_kwargs": {},
+          "name": "Image_read(1)",
+          "pos": [260.0,  300.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "Operator",
+          "tmpl_function_kwargs": {},
+          "name": "Operator",
+          "pos": [20.0,  300.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "Operator",
+          "tmpl_function_kwargs": {},
+          "name": "Operator(1)",
+          "pos": [20.0,  430.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "eureka.vision.pcl.nodes.point_cloud_write.PointCloudWrite",
+          "tmpl_function_kwargs": {},
+          "name": "write_point_cloud",
+          "pos": [840.0,  620.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "Operator",
+          "tmpl_function_kwargs": {},
+          "name": "Operator(2)",
+          "pos": [40.0,  670.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "Node_toList",
+          "tmpl_function_kwargs": {"n_inputs":  2,  "input_type":  null},
+          "name": "To_list",
+          "pos": [680.0,  510.0],
+          "collapsed": true,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        }
+      ],
+      "groups": {},
+      "edges": [
+        {
+          "src_port": "Image_read[0]",
+          "target_port": "Deep_learning_stereo[2]"
+        },
+        {
+          "src_port": "Image_read(1)[0]",
+          "target_port": "Deep_learning_stereo[1]"
+        },
+        {"src_port":  "Operator[0]",  "target_port":  "Image_read[0]"},
+        {"src_port":  "Operator(1)[0]",  "target_port":  "Image_read(1)[0]"},
+        {
+          "src_port": "Operator(2)[0]",
+          "target_port": "write_point_cloud[1]"
+        },
+        {"src_port":  "Deep_learning_stereo[0]",  "target_port":  "To_list[0]"},
+        {"src_port":  "Deep_learning_stereo[1]",  "target_port":  "To_list[1]"}
+      ],
+      "edges_ext": [
+        {"src_port":  "graph_inputs[0]",  "target_port":  "Operator[2]"},
+        {"src_port":  "graph_inputs[0]",  "target_port":  "Operator(1)[2]"},
+        {"src_port":  "graph_inputs[0]",  "target_port":  "Operator(2)[2]"}
+      ],
+      "graph_input_ports": [["Operator[2]",  "Operator(1)[2]",  "Operator(2)[2]"]],
+      "graph_output_ports": [],
+      "graph_input_defaults": {
+        "api_version": 3,
+        "tmpl_function_str": "DefaultValues",
+        "tmpl_function_kwargs": {
+          "values": [
+            {
+              "type": "simple",
+              "name": "idx",
+              "required": false,
+              "data": 2
+            }
+          ],
+          "return_scalar": true,
+          "search_paths": null,
+          "kwargs": {}
+        },
+        "name": "graph_inputs",
+        "pos": [-170.0,  160.0],
+        "collapsed": false,
+        "is_in_mock_mode": false,
+        "mock_tmpl_function_str": null,
+        "mock_tmpl_function_kwargs": null,
+        "skip_if": "any"
+      },
+      "graph_output_node": {
+        "api_version": 3,
+        "tmpl_function_str": "GraphOutputs",
+        "tmpl_function_kwargs": {"n_inputs":  0,  "output_names":  []},
+        "name": "graph_outputs",
+        "pos": [800.0,  190.0],
+        "collapsed": false,
+        "is_in_mock_mode": false,
+        "mock_tmpl_function_str": null,
+        "mock_tmpl_function_kwargs": null,
+        "skip_if": "any"
+      },
+      "description": "",
+      "node_input_port_default_values": {
+        "Image_read": {
+          "1": "bgr",
+          "0": "config://stereo_md/60cm/switches/right/image (1).png"
+        },
+        "Image_read(1)": {
+          "1": "bgr",
+          "0": "config://stereo_md/60cm/switches/left/image (1).png"
+        },
+        "Deep_learning_stereo": {"0":  "config://stereo_md/info.json"},
+        "Operator": {
+          "1": "config://stereo_md/60cm/switches/left/image (%d).png",
+          "0": "mod"
+        },
+        "Operator(1)": {
+          "1": "config://stereo_md/60cm/switches/right/image (%d).png",
+          "0": "mod"
+        },
+        "Operator(2)": {
+          "1": "config://stereo_md/60cm/switches/large_pcl_(%d).ply",
+          "0": "mod"
+        },
+        "write_point_cloud": {"2":  true}
+      }
+    },
+    {
+      "api_version": 3,
+      "name": "collect",
+      "nodes": [
+        {
+          "api_version": 3,
+          "tmpl_function_str": "GetCamera",
+          "tmpl_function_kwargs": {"device_name":  "nil"},
+          "name": "Get_camera",
+          "pos": [160.0,  120.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "GetCamera",
+          "tmpl_function_kwargs": {"device_name":  "nil"},
+          "name": "Get_camera(1)",
+          "pos": [110.0,  250.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "CameraCapture",
+          "tmpl_function_kwargs": {},
+          "name": "Camera_capture",
+          "pos": [470.0,  -50.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "EventStart",
+          "tmpl_function_kwargs": {},
+          "name": "Event_start",
+          "pos": [260.0,  -40.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "CameraCapture",
+          "tmpl_function_kwargs": {},
+          "name": "Camera_capture(1)",
+          "pos": [670.0,  170.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "ImageWrite",
+          "tmpl_function_kwargs": {},
+          "name": "Image_write",
+          "pos": [890.0,  -140.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        },
+        {
+          "api_version": 3,
+          "tmpl_function_str": "ImageWrite",
+          "tmpl_function_kwargs": {},
+          "name": "Image_write(1)",
+          "pos": [900.0,  180.0],
+          "collapsed": false,
+          "is_in_mock_mode": false,
+          "mock_tmpl_function_str": null,
+          "mock_tmpl_function_kwargs": null,
+          "skip_if": "any"
+        }
+      ],
+      "groups": {},
+      "edges": [
+        {"src_port":  "Event_start[0]",  "target_port":  "Camera_capture[0]"},
+        {"src_port":  "Get_camera[0]",  "target_port":  "Camera_capture[1]"},
+        {
+          "src_port": "Get_camera(1)[0]",
+          "target_port": "Camera_capture(1)[1]"
+        },
+        {
+          "src_port": "Camera_capture[0]",
+          "target_port": "Camera_capture(1)[0]"
+        },
+        {"src_port":  "Camera_capture[1]",  "target_port":  "Image_write[0]"},
+        {
+          "src_port": "Camera_capture(1)[1]",
+          "target_port": "Image_write(1)[0]"
+        }
+      ],
+      "edges_ext": [],
+      "graph_input_ports": [null],
+      "graph_output_ports": [],
+      "graph_input_defaults": {
+        "api_version": 3,
+        "tmpl_function_str": "DefaultValues",
+        "tmpl_function_kwargs": {
+          "return_scalar": true,
+          "values": [
+            {
+              "name": "input_name",
+              "type": "simple",
+              "data": 1,
+              "required": false
+            }
+          ]
+        },
+        "name": "graph_inputs",
+        "pos": [100.0,  200.0],
+        "collapsed": false,
+        "is_in_mock_mode": false,
+        "mock_tmpl_function_str": null,
+        "mock_tmpl_function_kwargs": null,
+        "skip_if": "any"
+      },
+      "graph_output_node": {
+        "api_version": 3,
+        "tmpl_function_str": "GraphOutputs",
+        "tmpl_function_kwargs": {"n_inputs":  0,  "output_names":  []},
+        "name": "graph_outputs",
+        "pos": [1040.0,  180.0],
+        "collapsed": false,
+        "is_in_mock_mode": false,
+        "mock_tmpl_function_str": null,
+        "mock_tmpl_function_kwargs": null,
+        "skip_if": "any"
+      },
+      "description": "",
+      "node_input_port_default_values": {
+        "Get_camera": {"0":  "left"},
+        "Get_camera(1)": {"0":  "right"},
+        "Camera_capture": {},
+        "Image_write": {"2":  "bgr",  "1":  "60cm/left/image.png"},
+        "Image_write(1)": {"2":  "bgr",  "1":  "60cm/right/image.png"},
+        "Sum": {"0":  0,  "1":  "_left.png"},
+        "Operator": {"0":  "mod"}
+      }
+    }
+  ],
+  "code_block": "",
+  "calib_profiles": [],
+  "simulation_config": {
+    "ros_param_yaml_file": "",
+    "ros_params": {},
+    "period": 0.01
+  }
+}
